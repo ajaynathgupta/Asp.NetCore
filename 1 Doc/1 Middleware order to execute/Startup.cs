@@ -46,18 +46,23 @@ namespace Asp.Net_Core
 				app.UseExceptionHandler("/Home/Error");
 			}
 
-			var defaultFilesOptions = new DefaultFilesOptions();
-			defaultFilesOptions.DefaultFileNames.Clear();
-			defaultFilesOptions.DefaultFileNames.Add("Foo.html");
-			app.UseDefaultFiles(defaultFilesOptions);
-			app.UseStaticFiles();
-			app.UseCookiePolicy();
-
-			app.UseMvc(routes =>
+			app.Use(async (context,next) =>
 			{
-				routes.MapRoute(
-					name: "default",
-					template: "{controller=Home}/{action=Index}/{id?}");
+				await context.Response.WriteAsync("MW1 - incomming-----");
+				await next();
+				await context.Response.WriteAsync("MW1 - outgoing-----");
+			});
+
+			app.Use(async (context, next) =>
+			{
+				await context.Response.WriteAsync("MW2 - incomming-----");
+				await next();
+				await context.Response.WriteAsync("MW2 - outgoing-----");
+			});
+
+			app.Run(async (context) =>
+			{
+				await context.Response.WriteAsync("MW - Final-----");
 			});
 		}
 	}
